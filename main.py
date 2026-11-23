@@ -1,32 +1,42 @@
 """One-Line Roast: The Gadget You Use Every Day — entry program.
 
-Writes a single roast line about a fridge to /output/entry.txt.
-The fridge polices the door with an alarm, yet stays silent while
-food quietly spoils inside it. Python 3.13, standard library only.
+The joke: a fridge that screams about an open door yet keeps quiet
+while its contents spoil. This program renders that single line and
+stores it as the contest entry. Python 3.13, standard library only.
 """
 
-from pathlib import Path
+import os
 
-OUTPUT_PATH = Path("/output/entry.txt")
+# The roast is kept as three beats: the alarm, the silence, the spoil.
+BEATS = {
+    "alarm": "My fridge beeps like mad if I hold the door open for ten seconds,",
+    "silence": "but said nothing for three weeks",
+    "spoil": "while the milk quietly turned into cheese.",
+}
 
-# The roast: one line, 141 characters, punch lands on the last word.
-ROAST_PARTS = [
-    "My fridge beeps like mad if I hold the door open for ten seconds,",
-    "but said nothing for three weeks",
-    "while the milk quietly turned into cheese.",
-]
-
-
-def build_line() -> str:
-    """Join the roast fragments into the single entry line."""
-    return " ".join(ROAST_PARTS)
+TEMPLATE = "{alarm} {silence} {spoil}"
 
 
-def main() -> None:
-    line = build_line()
-    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT_PATH.write_text(line, encoding="utf-8")
+def render_roast() -> str:
+    """Fill the template's beats into the finished one-liner."""
+    return TEMPLATE.format(**BEATS)
+
+
+def entry_destination() -> str:
+    """Location the harness reads the entry from."""
+    return os.path.join(os.sep + "output", "entry.txt")
+
+
+def emit(text: str, destination: str) -> None:
+    """Write text as UTF-8 bytes, adding no trailing newline."""
+    os.makedirs(os.path.dirname(destination), exist_ok=True)
+    with open(destination, "wb") as handle:
+        handle.write(text.encode("utf-8"))
+
+
+def run() -> None:
+    emit(render_roast(), entry_destination())
 
 
 if __name__ == "__main__":
-    main()
+    run()
